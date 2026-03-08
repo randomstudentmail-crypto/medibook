@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="MediBook — Online Hospital Appointment Booking System">
+<title>MediBook — Hospital Appointment System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0a1628;--teal:#0d9488;--teal-light:#14b8a6;--cream:#faf7f2;--gold:#d4a853;--white:#fff;--g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g300:#d1d5db;--g400:#9ca3af;--g600:#4b5563;--g700:#374151;--red:#ef4444;--green:#10b981;--purple:#6366f1;--r:12px;--sh:0 4px 24px rgba(10,22,40,.10);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);min-height:100vh;}
+
+/* NAV */
+nav{background:var(--navy);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+.logo{font-family:'Playfair Display',serif;font-size:21px;color:#fff;}
+.logo span{color:var(--teal-light);}
+.nav-links{display:flex;gap:4px;align-items:center;}
+.nb{background:none;border:none;color:var(--g400);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:8px 13px;border-radius:8px;cursor:pointer;transition:all .2s;}
+.nb:hover,.nb.active{background:rgba(13,148,136,.15);color:var(--teal-light);}
+.nb.cta{background:var(--teal);color:#fff;font-weight:600;margin-left:6px;}
+.nb.cta:hover{background:var(--teal-light);}
+.nav-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:3px;display:none;}
+.email-display{font-size:11px;color:var(--g400);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:4px 10px;}
+
+/* LAYOUT */
+.main{max-width:1100px;margin:0 auto;padding:36px 20px;}
+.page{display:none;animation:fadeIn .25s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,#0f2a4a 100%);border-radius:20px;padding:48px 44px;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;margin-bottom:32px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;right:-60px;top:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(13,148,136,.22) 0%,transparent 70%);border-radius:50%;}
+.hero h1{font-family:'Playfair Display',serif;font-size:34px;color:#fff;line-height:1.2;margin-bottom:10px;}
+.hero h1 em{color:var(--teal-light);font-style:normal;}
+.hero p{color:var(--g400);font-size:15px;line-height:1.6;max-width:400px;}
+.hero-stats{display:flex;gap:28px;margin-top:22px;}
+.sn{font-size:24px;font-weight:700;color:var(--teal-light);}
+.sl{font-size:11px;color:var(--g400);margin-top:2px;}
+.hero-cta{display:flex;flex-direction:column;gap:10px;z-index:1;}
+.bth{padding:13px 28px;border-radius:10px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;border:none;white-space:nowrap;}
+.bth.p{background:var(--teal);color:#fff;}
+.bth.p:hover{background:var(--teal-light);transform:translateY(-1px);}
+.bth.s{background:rgba(255,255,255,.09);color:#fff;border:1px solid rgba(255,255,255,.2);}
+.bth.s:hover{background:rgba(255,255,255,.16);}
+
+/* STATS CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.stat-card{background:#fff;border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px;}
+.si{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.sv .val{font-size:22px;font-weight:700;}
+.sv .lbl{font-size:12px;color:var(--g400);margin-top:1px;}
+
+/* SECTION HEADER */
+.sh{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;}
+.sh h2{font-family:'Playfair Display',serif;font-size:23px;}
+.sh p{color:var(--g600);font-size:13px;margin-top:3px;}
+
+/* CARDS */
+.card{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--sh);}
+.ct{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.ci{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ct{background:rgba(13,148,136,.1);}
+.cg-i{background:rgba(212,168,83,.1);}
+.cp-i{background:rgba(99,102,241,.1);}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.g2c{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+
+/* FORM */
+.fr{margin-bottom:13px;}
+.fr label{display:block;font-size:11px;font-weight:700;color:var(--g600);margin-bottom:5px;text-transform:uppercase;letter-spacing:.3px;}
+.fr input,.fr select,.fr textarea{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--navy);background:var(--g50);transition:border .2s;outline:none;}
+.fr input:focus,.fr select:focus,.fr textarea:focus{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px rgba(13,148,136,.07);}
+.fr input.err,.fr select.err{border-color:var(--red);}
+.fr textarea{resize:vertical;min-height:72px;}
+.req{color:var(--red);}
+.err-msg{color:var(--red);font-size:11px;margin-top:4px;display:none;}
+
+/* SPECIALTY CARDS */
+.spec-card{border:2px solid var(--g200);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;background:#fff;text-align:center;}
+.spec-card:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:0 8px 18px rgba(13,148,136,.12);}
+.spec-emoji{font-size:30px;margin-bottom:7px;}
+.spec-name{font-size:13px;font-weight:700;}
+.spec-sub{font-size:11px;color:var(--g400);margin-top:1px;}
+.spec-avail{font-size:11px;font-weight:700;color:var(--green);margin-top:5px;}
+
+/* DOCTOR CARDS */
+.doc-card{border:2px solid var(--g200);border-radius:var(--r);padding:13px;cursor:pointer;transition:all .2s;background:#fff;position:relative;}
+.doc-card:hover{border-color:var(--teal);box-shadow:0 4px 14px rgba(13,148,136,.14);}
+.doc-card.sel{border-color:var(--teal);background:rgba(13,148,136,.04);}
+.doc-card.sel::after{content:'✓';position:absolute;top:7px;right:9px;color:var(--teal);font-weight:700;font-size:13px;}
+.doc-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:7px;background:rgba(13,148,136,.07);}
+.doc-name{font-size:13px;font-weight:700;}
+.doc-sp{font-size:11px;color:var(--teal);font-weight:600;margin-top:1px;}
+.doc-fee{font-size:11px;color:var(--g400);margin-top:3px;}
+.doc-ok{font-size:11px;font-weight:600;color:var(--green);margin-top:2px;}
+
+/* SLOTS */
+.slots-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:4px;}
+.slot{padding:8px 4px;border:1.5px solid var(--g200);border-radius:7px;text-align:center;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;background:#fff;color:var(--navy);}
+.slot:hover:not(.bk){border-color:var(--teal);color:var(--teal);}
+.slot.sel{background:var(--teal);border-color:var(--teal);color:#fff;}
+.slot.bk{background:var(--g100);color:var(--g300);cursor:not-allowed;font-size:11px;}
+
+/* STEPS */
+.steps{display:flex;margin-bottom:26px;}
+.step{flex:1;position:relative;}
+.step-line{position:absolute;top:16px;left:50%;right:0;height:2px;background:var(--g200);transition:background .4s;}
+.step:last-child .step-line{display:none;}
+.step.done .step-line{background:var(--teal);}
+.step-inner{display:flex;flex-direction:column;align-items:center;}
+.step-circle{width:32px;height:32px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:#fff;color:var(--g400);z-index:1;position:relative;transition:all .3s;}
+.step.done .step-circle{background:var(--teal);border-color:var(--teal);color:#fff;}
+.step.active .step-circle{border-color:var(--teal);color:var(--teal);}
+.step-lbl{font-size:11px;color:var(--g400);margin-top:5px;text-align:center;font-weight:500;}
+.step.done .step-lbl,.step.active .step-lbl{color:var(--navy);font-weight:600;}
+
+/* SUMMARY */
+.sum-box{background:var(--g50);border-radius:10px;padding:14px;margin-top:10px;border:1px solid var(--g200);}
+.sum-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--g100);font-size:13px;}
+.sum-row:last-child{border-bottom:none;font-weight:700;font-size:14px;padding-top:10px;}
+.sum-row span:first-child{color:var(--g600);}
+.sum-row.total span:last-child{color:var(--teal);}
+
+/* APPOINTMENTS */
+.appt-list{display:flex;flex-direction:column;gap:9px;}
+.appt-item{display:grid;grid-template-columns:48px 1fr auto auto;gap:12px;align-items:center;padding:14px 16px;background:#fff;border-radius:var(--r);border:1px solid var(--g200);box-shadow:0 2px 6px rgba(0,0,0,.04);transition:all .2s;}
+.appt-item:hover{box-shadow:var(--sh);border-color:var(--g300);}
+.appt-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--g100);}
+.appt-info h4{font-size:14px;font-weight:700;}
+.appt-info p{font-size:12px;color:var(--g600);margin-top:1px;}
+.appt-time .t{font-size:14px;font-weight:700;text-align:right;}
+.appt-time .d{font-size:11px;color:var(--g400);text-align:right;margin-top:1px;}
+.appt-actions{display:flex;gap:5px;}
+.bsm{padding:6px 10px;border-radius:6px;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all .2s;}
+.bv{background:rgba(13,148,136,.1);color:var(--teal);}
+.bv:hover{background:var(--teal);color:#fff;}
+.bc{background:rgba(239,68,68,.08);color:var(--red);}
+.bc:hover{background:var(--red);color:#fff;}
+.be{background:var(--g100);color:var(--navy);}
+.be:hover{background:var(--g200);}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;}
+.b-c{background:rgba(16,185,129,.1);color:var(--green);}
+.b-pb{background:rgba(99,102,241,.1);color:var(--purple);}
+.b-x{background:rgba(239,68,68,.08);color:var(--red);}
+.b-p{background:rgba(212,168,83,.15);color:#a16207;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(10,22,40,.62);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px);}
+.overlay.show{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:18px;padding:32px;width:90%;transform:translateY(16px);transition:transform .3s;box-shadow:0 20px 60px rgba(10,22,40,.3);}
+.overlay.show .modal{transform:translateY(0);}
+.modal.sm{max-width:440px;}
+.modal.md{max-width:540px;}
+.m-icon{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;}
+.modal h3{font-family:'Playfair Display',serif;font-size:21px;text-align:center;margin-bottom:5px;}
+.modal .sub{color:var(--g600);font-size:13px;text-align:center;margin-bottom:22px;}
+.cg{background:var(--g50);border-radius:12px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:18px;border:1px solid var(--g200);}
+.cgi label{font-size:10px;color:var(--g400);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.cgi span{display:block;font-size:13px;font-weight:600;margin-top:1px;}
+.ticket-box{text-align:center;background:linear-gradient(135deg,rgba(13,148,136,.07),rgba(13,148,136,.02));border:1px dashed var(--teal);border-radius:10px;padding:12px 20px;margin-bottom:18px;}
+.ticket-box .tid{font-family:monospace;font-size:17px;font-weight:700;color:var(--teal);letter-spacing:2px;}
+.ticket-box p{font-size:11px;color:var(--g400);margin-top:2px;}
+.mbts{display:flex;gap:9px;}
+.btn-p{flex:1;padding:12px;background:var(--teal);color:#fff;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-p:hover{background:var(--teal-light);}
+.btn-s{padding:12px 16px;background:var(--g100);color:var(--navy);border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;}
+.btn-s:hover{background:var(--g200);}
+.btn-d{flex:1;padding:12px;background:var(--red);color:#fff;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-d:hover{background:#dc2626;}
+
+/* PREBOOK BANNER */
+.pb-banner{background:linear-gradient(135deg,#1a0533,#0f1a3a);border-radius:var(--r);padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:22px;border:1px solid rgba(99,102,241,.3);}
+.pb-banner h3{color:#fff;font-size:15px;font-weight:600;}
+.pb-banner p{color:rgba(255,255,255,.5);font-size:12px;margin-top:2px;}
+.btn-pb{margin-left:auto;white-space:nowrap;padding:9px 18px;background:rgba(99,102,241,.8);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+
+/* SEARCH/FILTER BAR */
+.sb{display:flex;gap:9px;margin-bottom:16px;}
+.sb input{flex:1;padding:9px 13px;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;background:var(--g50);}
+.sb input:focus{border-color:var(--teal);background:#fff;}
+.fsel{padding:9px 11px;border:1.5px solid var(--g200);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;outline:none;background:var(--g50);}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--g100);padding:3px;border-radius:9px;margin-bottom:20px;width:fit-content;}
+.tab{padding:7px 16px;border:none;background:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--g600);transition:all .2s;}
+.tab.active{background:#fff;color:var(--navy);box-shadow:0 2px 7px rgba(0,0,0,.07);}
+
+/* EMAIL GATE */
+.email-gate{max-width:480px;margin:80px auto;background:#fff;border-radius:20px;padding:40px;box-shadow:var(--sh);text-align:center;}
+.email-gate h2{font-family:'Playfair Display',serif;font-size:26px;margin-bottom:8px;}
+.email-gate p{color:var(--g600);font-size:14px;margin-bottom:28px;}
+
+/* TICKET PRINT CARD */
+.tp{background:#fff;border:2px dashed var(--teal);border-radius:12px;padding:20px;margin-top:14px;}
+.tp-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--g200);}
+.tp-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tp-i label{font-size:10px;color:var(--g400);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.tp-i span{display:block;font-size:13px;font-weight:600;margin-top:1px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:26px;right:26px;background:var(--navy);color:#fff;padding:12px 20px;border-radius:11px;font-size:13px;font-weight:500;box-shadow:0 8px 26px rgba(0,0,0,.25);transform:translateY(80px);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:9999;max-width:300px;}
+.toast.show{transform:translateY(0);}
+.toast.success{border-left:4px solid var(--green);}
+.toast.error{border-left:4px solid var(--red);}
+.toast.info{border-left:4px solid var(--teal);}
+
+/* LOADING */
+.loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;height:80px;}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+
+/* EXPORT BUTTONS */
+.btn-exp{padding:8px 14px;background:var(--teal);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-exp:hover{background:var(--teal-light);}
+
+.btn-main{padding:12px 26px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.btn-main:hover{background:var(--teal-light);}
+.btn-main:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+.empty{text-align:center;padding:44px 20px;}
+.empty-icon{font-size:42px;margin-bottom:10px;}
+.empty h4{font-size:15px;font-weight:700;margin-bottom:6px;}
+.empty p{color:var(--g400);font-size:13px;}
+
+@media(max-width:760px){
+  .hero{grid-template-columns:1fr;padding:26px 18px;}
+  .g2,.g3,.g2c,.stats-row{grid-template-columns:1fr;}
+  .slots-grid{grid-template-columns:repeat(3,1fr);}
+  .appt-item{grid-template-columns:42px 1fr;gap:9px;}
+  .appt-actions,.appt-time{grid-column:span 2;}
+  nav{padding:0 12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Medi<span>Book</span></div>
+  <div class="nav-links">
+    <button class="nb active" id="nav-home"         onclick="showPage('home')">🏠 Home</button>
+    <button class="nb"        id="nav-book"         onclick="showPage('book')">📅 Book</button>
+    <button class="nb"        id="nav-prebook"      onclick="showPage('prebook')">⏰ Pre-Book</button>
+    <button class="nb"        id="nav-appointments" onclick="showPage('appointments')">📋 My Appointments <span class="nav-badge" id="nav-count">0</span></button>
+    <button class="nb"        id="nav-profile"      onclick="showPage('profile')">👤 Profile</button>
+    <button class="nb cta"                          onclick="showPage('book')">+ New Booking</button>
+    <span class="email-display" id="user-email-display" style="display:none;"></span>
+  </div>
+</nav>
+
+<!-- EMAIL GATE (shown if no email set) -->
+<div id="email-gate" style="display:none;">
+  <div class="email-gate">
+    <div style="font-size:48px;margin-bottom:16px;">🏥</div>
+    <h2>Welcome to MediBook</h2>
+    <p>Enter your email address to access your appointments and start booking.</p>
+    <div class="fr" style="text-align:left;margin-bottom:16px;">
+      <label>Your Email Address</label>
+      <input type="email" id="gate-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')setEmail()">
+    </div>
+    <button class="btn-main" style="width:100%;" onclick="setEmail()">Continue →</button>
+    <p style="font-size:11px;color:var(--g400);margin-top:14px;">We use your email to retrieve your appointments and send booking confirmations.</p>
+  </div>
+</div>
+
+<!-- APP WRAPPER -->
+<div id="app" style="display:none;">
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+<div class="main">
+  <div class="hero">
+    <div>
+      <h1>Book Your <em>Doctor</em><br>Appointment Online</h1>
+      <p>Skip the queue. Choose a specialist, pick a slot, get instant confirmation — and a confirmation email.</p>
+      <div class="hero-stats">
+        <div><div class="sn" id="h-total">0</div><div class="sl">My Bookings</div></div>
+        <div><div class="sn" id="h-conf">0</div><div class="sl">Confirmed</div></div>
+        <div><div class="sn">48+</div><div class="sl">Specialists</div></div>
+      </div>
+    </div>
+    <div class="hero-cta">
+      <button class="bth p" onclick="showPage('book')">Book Appointment Now</button>
+      <button class="bth s" onclick="showPage('prebook')">Pre-Book a Future Slot</button>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="si" style="background:rgba(13,148,136,.1)">📅</div><div class="sv"><div class="val" id="sc-up">0</div><div class="lbl">Upcoming</div></div></div>
+    <div class="stat-card"><div class="si" style="background:rgba(16,185,129,.1)">✅</div><div class="sv"><div class="val" id="sc-co">0</div><div class="lbl">Confirmed</div></div></div>
+    <div class="stat-card"><div class="si" style="background:rgba(99,102,241,.1)">⏰</div><div class="sv"><div class="val" id="sc-pb">0</div><div class="lbl">Pre-booked</div></div></div>
+    <div class="stat-card"><div class="si" style="background:rgba(239,68,68,.08)">❌</div><div class="sv"><div class="val" id="sc-ca">0</div><div class="lbl">Cancelled</div></div></div>
+  </div>
+  <div class="sh"><div><h2>Browse Specialties</h2><p>Tap to start booking</p></div></div>
+  <div class="g3" style="margin-bottom:30px;">
+    <div class="spec-card" onclick="quickBook('Cardiology')"><div class="spec-emoji">❤️</div><div class="spec-name">Cardiology</div><div class="spec-sub">Heart & Vascular</div><div class="spec-avail">● Available today</div></div>
+    <div class="spec-card" onclick="quickBook('Neurology')"><div class="spec-emoji">🧠</div><div class="spec-name">Neurology</div><div class="spec-sub">Brain & Nerves</div><div class="spec-avail">● Available today</div></div>
+    <div class="spec-card" onclick="quickBook('Orthopedics')"><div class="spec-emoji">🦴</div><div class="spec-name">Orthopedics</div><div class="spec-sub">Bones & Joints</div><div class="spec-avail">● Available today</div></div>
+    <div class="spec-card" onclick="quickBook('Dermatology')"><div class="spec-emoji">🩺</div><div class="spec-name">Dermatology</div><div class="spec-sub">Skin & Hair</div><div class="spec-avail">● Available today</div></div>
+    <div class="spec-card" onclick="quickBook('Pediatrics')"><div class="spec-emoji">👶</div><div class="spec-name">Pediatrics</div><div class="spec-sub">Child Health</div><div class="spec-avail">● Available today</div></div>
+    <div class="spec-card" onclick="quickBook('General Medicine')"><div class="spec-emoji">🏥</div><div class="spec-name">General Medicine</div><div class="spec-sub">Primary Care</div><div class="spec-avail">● Available today</div></div>
+  </div>
+  <div class="sh"><div><h2>Recent Appointments</h2></div><button class="bsm bv" onclick="showPage('appointments')">View All →</button></div>
+  <div id="home-recent"></div>
+</div></div>
+
+<!-- BOOK -->
+<div id="page-book" class="page">
+<div class="main">
+  <div class="sh"><div><h2>Book an Appointment</h2><p>All confirmed bookings receive an email confirmation</p></div></div>
+  <div class="steps">
+    <div class="step active" id="s1"><div class="step-line"></div><div class="step-inner"><div class="step-circle" id="sc1">1</div><div class="step-lbl">Patient Info</div></div></div>
+    <div class="step" id="s2"><div class="step-line"></div><div class="step-inner"><div class="step-circle" id="sc2">2</div><div class="step-lbl">Doctor</div></div></div>
+    <div class="step" id="s3"><div class="step-line"></div><div class="step-inner"><div class="step-circle" id="sc3">3</div><div class="step-lbl">Date & Slot</div></div></div>
+    <div class="step" id="s4"><div class="step-inner"><div class="step-circle" id="sc4">4</div><div class="step-lbl">Confirm</div></div></div>
+  </div>
+  <div class="g2" style="align-items:start;">
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(13,148,136,.1)">👤</span> Patient Information</div>
+        <div class="g2c">
+          <div class="fr"><label>First Name <span class="req">*</span></label><input type="text" id="b-fn" placeholder="John" oninput="updateSum()"></div>
+          <div class="fr"><label>Last Name <span class="req">*</span></label><input type="text" id="b-ln" placeholder="Doe" oninput="updateSum()"></div>
+        </div>
+        <div class="fr"><label>Email Address <span class="req">*</span></label><input type="email" id="b-em" placeholder="Confirmation will be sent here" oninput="updateSum()"></div>
+        <div class="g2c">
+          <div class="fr"><label>Phone <span class="req">*</span></label><input type="tel" id="b-ph" placeholder="+1 234 567 8900"></div>
+          <div class="fr"><label>Date of Birth</label><input type="date" id="b-dob"></div>
+        </div>
+        <div class="g2c">
+          <div class="fr"><label>Gender</label><select id="b-gn"><option value="">Select...</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+          <div class="fr"><label>Blood Group</label><select id="b-bl"><option value="">—</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select></div>
+        </div>
+        <div class="fr"><label>Reason for Visit <span class="req">*</span></label><textarea id="b-rs" placeholder="Describe your symptoms or reason for visit..." oninput="updateSum()"></textarea></div>
+        <div class="g2c">
+          <div class="fr"><label>Insurance No.</label><input type="text" id="b-ins" placeholder="Optional"></div>
+          <div class="fr"><label>Visit Type</label><select id="b-vt" onchange="updateSum()"><option>In-Person Visit</option><option>Video Consultation</option><option>Emergency</option></select></div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(212,168,83,.1)">👨‍⚕️</span> Select Doctor</div>
+        <div class="fr"><label>Filter by Specialty</label><select id="b-sp" onchange="loadDoctors()"><option value="">All Specialties</option><option>Cardiology</option><option>Neurology</option><option>Orthopedics</option><option>Dermatology</option><option>Pediatrics</option><option>General Medicine</option></select></div>
+        <div class="g3" id="doc-grid" style="margin-top:8px;"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+        <div class="err-msg" id="doc-err">Please select a doctor.</div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(13,148,136,.1)">📅</span> Date & Time Slot</div>
+        <div class="fr"><label>Preferred Date <span class="req">*</span></label><input type="date" id="b-dt" onchange="loadSlots()"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-size:13px;font-weight:600;">🕐 Available Slots</div>
+          <div style="font-size:11px;color:var(--g400);">⬜ Booked &nbsp; 🟢 Available</div>
+        </div>
+        <div class="slots-grid" id="slots-grid"><div style="grid-column:span 4;color:var(--g400);font-size:13px;padding:18px 0;text-align:center;">Select a doctor and date first</div></div>
+        <div class="err-msg" id="slot-err" style="margin-top:6px;">Please select a time slot.</div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(212,168,83,.1)">📋</span> Booking Summary</div>
+        <div id="book-sum"><div style="text-align:center;padding:20px 0;color:var(--g400);font-size:13px;"><div style="font-size:24px;margin-bottom:5px;">📝</div>Fill the form to preview</div></div>
+        <div style="background:rgba(13,148,136,.07);border-radius:8px;padding:10px 13px;margin-top:12px;font-size:12px;color:var(--teal);font-weight:500;">
+          📧 A confirmation email will be sent to the address provided above
+        </div>
+        <button class="btn-main" style="width:100%;margin-top:14px;" id="btn-confirm-book" onclick="submitBooking()">🔒 Confirm & Book Appointment</button>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- PRE-BOOK -->
+<div id="page-prebook" class="page">
+<div class="main">
+  <div class="sh"><div><h2>Pre-Book Appointment</h2><p>Reserve a slot up to 90 days in advance</p></div></div>
+  <div class="pb-banner">
+    <div style="font-size:30px;">⏰</div>
+    <div><h3>Pre-Booking Advantage</h3><p>Priority slot reservation. Confirmation email sent immediately upon submission.</p></div>
+    <button class="btn-pb" onclick="document.getElementById('p-fn').focus()">Start →</button>
+  </div>
+  <div class="g2" style="align-items:start;">
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(99,102,241,.1)">⏰</span> Pre-Booking Form</div>
+      <div class="g2c">
+        <div class="fr"><label>First Name <span class="req">*</span></label><input type="text" id="p-fn" placeholder="Jane"></div>
+        <div class="fr"><label>Last Name <span class="req">*</span></label><input type="text" id="p-ln" placeholder="Smith"></div>
+      </div>
+      <div class="fr"><label>Email <span class="req">*</span></label><input type="email" id="p-em" placeholder="Confirmation will be sent here"></div>
+      <div class="fr"><label>Phone <span class="req">*</span></label><input type="tel" id="p-ph" placeholder="+1 234 567 8900"></div>
+      <div class="fr"><label>Specialty <span class="req">*</span></label><select id="p-sp"><option value="">Select specialty...</option><option>Cardiology</option><option>Neurology</option><option>Orthopedics</option><option>Dermatology</option><option>Pediatrics</option><option>General Medicine</option></select></div>
+      <div class="fr"><label>Preferred Doctor</label><select id="p-dr" id="doc-presel"></select></div>
+      <div class="g2c">
+        <div class="fr"><label>Preferred Date <span class="req">*</span></label><input type="date" id="p-dt"></div>
+        <div class="fr"><label>Time</label><select id="p-tm"><option>09:00 AM</option><option>09:30 AM</option><option>10:00 AM</option><option>10:30 AM</option><option>11:00 AM</option><option>02:00 PM</option><option>03:00 PM</option><option>04:00 PM</option></select></div>
+      </div>
+      <div class="g2c">
+        <div class="fr"><label>Visit Type</label><select id="p-vt"><option>In-Person Visit</option><option>Video Consultation</option><option>Emergency</option></select></div>
+        <div class="fr"><label>Priority</label><select id="p-pr"><option>Routine</option><option>Follow-up</option><option>Urgent</option></select></div>
+      </div>
+      <div class="fr"><label>Notes / Symptoms</label><textarea id="p-nt" placeholder="Any special requirements or symptoms..."></textarea></div>
+      <button class="btn-main" style="width:100%;background:var(--purple);" id="btn-prebook" onclick="submitPreBook()">📌 Submit Pre-Booking Request</button>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;">ℹ️ How Pre-Booking Works</div>
+        <div style="font-size:13px;color:var(--g600);line-height:1.9;">
+          <div>1️⃣ Fill out and submit the form</div>
+          <div>2️⃣ Your slot is held with priority access</div>
+          <div>3️⃣ <strong>Confirmation email sent instantly</strong></div>
+          <div>4️⃣ Reminders at 48h &amp; 2h before appointment</div>
+          <div>5️⃣ Free cancellation up to 24h before</div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;">📞 Contact</div>
+        <div style="font-size:13px;color:var(--g600);line-height:2.1;">
+          <div>📞 <strong>1-800-MEDIBOOK</strong></div>
+          <div>📧 <strong>support@medibook.health</strong></div>
+          <div>🕘 Mon–Sat 8AM–8PM</div>
+          <div>🚨 Emergency: <strong>911</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- APPOINTMENTS -->
+<div id="page-appointments" class="page">
+<div class="main">
+  <div class="sh">
+    <div><h2>My Appointments</h2><p>Saved to database — accessible from any device</p></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-exp" onclick="exportCSV()">⬇️ Export CSV</button>
+      <button class="btn-main" onclick="showPage('book')">+ New Booking</button>
+    </div>
+  </div>
+  <div class="sb">
+    <input type="text" id="s-appt" placeholder="🔍 Search by doctor, specialty, ticket ID..." oninput="renderAppts()">
+    <select class="fsel" id="f-status" onchange="renderAppts()"><option value="">All Status</option><option value="confirmed">Confirmed</option><option value="prebooked">Pre-booked</option><option value="cancelled">Cancelled</option></select>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('all',this)">All</button>
+    <button class="tab" onclick="setTab('upcoming',this)">Upcoming</button>
+    <button class="tab" onclick="setTab('past',this)">Past</button>
+    <button class="tab" onclick="setTab('prebooked',this)">Pre-booked</button>
+  </div>
+  <div id="appt-list"><div class="skeleton" style="margin-bottom:8px;"></div><div class="skeleton" style="margin-bottom:8px;"></div></div>
+</div></div>
+
+<!-- PROFILE -->
+<div id="page-profile" class="page">
+<div class="main">
+  <div class="sh"><div><h2>My Profile</h2><p>Personal & medical info saved to database</p></div></div>
+  <div class="g2" style="align-items:start;">
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(13,148,136,.1)">👤</span> Personal Information</div>
+      <div class="g2c">
+        <div class="fr"><label>First Name</label><input type="text" id="pf-fn" placeholder="John"></div>
+        <div class="fr"><label>Last Name</label><input type="text" id="pf-ln" placeholder="Doe"></div>
+      </div>
+      <div class="fr"><label>Email (read-only)</label><input type="email" id="pf-em" readonly style="background:var(--g100);cursor:not-allowed;"></div>
+      <div class="fr"><label>Phone</label><input type="tel" id="pf-ph" placeholder="+1 234 567 8900"></div>
+      <div class="g2c">
+        <div class="fr"><label>Date of Birth</label><input type="date" id="pf-db"></div>
+        <div class="fr"><label>Gender</label><select id="pf-gn"><option value="">—</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+      </div>
+      <div class="g2c">
+        <div class="fr"><label>Blood Group</label><select id="pf-bl"><option value="">—</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select></div>
+        <div class="fr"><label>Insurance No.</label><input type="text" id="pf-ins" placeholder="Optional"></div>
+      </div>
+      <div class="fr"><label>Address</label><textarea id="pf-addr" placeholder="Your address..." style="min-height:58px;"></textarea></div>
+      <div class="fr"><label>Emergency Contact</label><input type="text" id="pf-ec" placeholder="Name & Phone"></div>
+      <div class="fr"><label>Allergies / Medical Notes</label><textarea id="pf-al" placeholder="Known allergies, chronic conditions..." style="min-height:58px;"></textarea></div>
+      <button class="btn-main" style="width:100%;margin-top:6px;" onclick="saveProfile()">💾 Save Profile to Database</button>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;">📊 Account Summary</div>
+        <div id="prof-sum" style="font-size:13px;color:var(--g600);line-height:2.1;"></div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px;">⚙️ Account</div>
+        <div style="font-size:13px;color:var(--g600);margin-bottom:12px;">Your data is stored securely in our database.</div>
+        <button class="btn-exp" style="width:100%;margin-bottom:8px;" onclick="exportCSV()">⬇️ Export Appointments (CSV)</button>
+        <button style="width:100%;padding:9px;border:1.5px solid var(--red);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;background:none;color:var(--red);margin-top:4px;" onclick="switchEmail()">🔄 Switch Account</button>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+</div><!-- /app -->
+
+<!-- MODAL: CONFIRM -->
+<div class="overlay" id="m-confirm">
+  <div class="modal sm">
+    <div class="m-icon" style="background:rgba(16,185,129,.1);">✅</div>
+    <h3>Booking Confirmed!</h3>
+    <p class="sub">Saved to database. A confirmation email has been sent to your address.</p>
+    <div class="ticket-box"><div class="tid" id="m-tid"></div><p>Your Ticket ID</p></div>
+    <div class="cg" id="m-detail"></div>
+    <div style="background:rgba(13,148,136,.08);border-radius:8px;padding:10px 14px;text-align:center;font-size:12px;color:var(--teal);font-weight:500;margin-bottom:16px;">
+      📧 Confirmation email sent to <strong id="m-email-sent"></strong>
+    </div>
+    <div class="mbts">
+      <button class="btn-s" onclick="closeModal('m-confirm')">Close</button>
+      <button class="btn-p" onclick="printTicket()">🖨️ Print</button>
+      <button class="btn-p" onclick="closeModal('m-confirm');showPage('appointments')">View All →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: VIEW -->
+<div class="overlay" id="m-view">
+  <div class="modal md">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <h3 style="font-family:'Playfair Display',serif;font-size:19px;">Appointment Details</h3>
+      <button onclick="closeModal('m-view')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--g400);">✕</button>
+    </div>
+    <div id="m-view-body"></div>
+  </div>
+</div>
+
+<!-- MODAL: CANCEL -->
+<div class="overlay" id="m-cancel">
+  <div class="modal sm">
+    <div class="m-icon" style="background:rgba(239,68,68,.1);">❌</div>
+    <h3>Cancel Appointment?</h3>
+    <p class="sub">This releases the slot and sends a cancellation email to the patient.</p>
+    <div id="m-cancel-info" style="background:var(--g50);border-radius:9px;padding:13px;margin-bottom:18px;font-size:13px;line-height:1.8;"></div>
+    <div class="mbts">
+      <button class="btn-s" onclick="closeModal('m-cancel')">Keep It</button>
+      <button class="btn-d" onclick="doCancel()">Yes, Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDIT -->
+<div class="overlay" id="m-edit">
+  <div class="modal md">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <h3 style="font-family:'Playfair Display',serif;font-size:19px;">Edit Appointment</h3>
+      <button onclick="closeModal('m-edit')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--g400);">✕</button>
+    </div>
+    <div class="g2c">
+      <div class="fr"><label>New Date</label><input type="date" id="ed-dt"></div>
+      <div class="fr"><label>New Time</label><select id="ed-sl"><option>08:00 AM</option><option>08:30 AM</option><option>09:00 AM</option><option>09:30 AM</option><option>10:00 AM</option><option>10:30 AM</option><option>11:00 AM</option><option>11:30 AM</option><option>01:00 PM</option><option>01:30 PM</option><option>02:00 PM</option><option>02:30 PM</option><option>03:00 PM</option><option>04:00 PM</option></select></div>
+    </div>
+    <div class="fr"><label>Visit Type</label><select id="ed-vt"><option>In-Person Visit</option><option>Video Consultation</option><option>Emergency</option></select></div>
+    <div class="fr"><label>Notes / Reason</label><textarea id="ed-rs" style="min-height:68px;"></textarea></div>
+    <div style="background:rgba(13,148,136,.07);border-radius:8px;padding:10px;font-size:12px;color:var(--teal);margin-bottom:14px;">📧 A reschedule notification will be sent to the patient's email</div>
+    <input type="hidden" id="ed-id">
+    <div class="mbts">
+      <button class="btn-s" onclick="closeModal('m-edit')">Cancel</button>
+      <button class="btn-p" onclick="saveEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+let userEmail = localStorage.getItem('mb_email') || '';
+let selDocId  = null;
+let selDocObj = null;
+let selSlot   = null;
+let allAppts  = [];
+let activeTab = 'all';
+let cancelTicket = null;
+let lastBookedTicket = null;
+let lastBookedEmail  = '';
+
+// ═══════════════════════════════════════════════════════════════
+//  API HELPERS
+// ═══════════════════════════════════════════════════════════════
+async function api(method, endpoint, body) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch('/api' + endpoint, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EMAIL GATE
+// ═══════════════════════════════════════════════════════════════
+function initApp() {
+  if (!userEmail) {
+    document.getElementById('email-gate').style.display = 'block';
+    document.getElementById('app').style.display = 'none';
+  } else {
+    document.getElementById('email-gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('user-email-display').textContent = userEmail;
+    document.getElementById('user-email-display').style.display = 'inline';
+    loadDoctors();
+    loadStats();
+    loadAppts();
+    loadProfForm();
+    populatePreBookDoctors();
+    prefillBookingEmail();
+  }
+}
+
+function setEmail() {
+  const e = document.getElementById('gate-email').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { toast('⚠️ Please enter a valid email.', 'error'); return; }
+  userEmail = e;
+  localStorage.setItem('mb_email', e);
+  initApp();
+}
+
+function switchEmail() {
+  localStorage.removeItem('mb_email');
+  userEmail = '';
+  location.reload();
+}
+
+function prefillBookingEmail() {
+  const el = document.getElementById('b-em');
+  if (el && userEmail) el.value = userEmail;
+  const pe = document.getElementById('p-em');
+  if (pe && userEmail) pe.value = userEmail;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  document.querySelectorAll('.nb:not(.cta)').forEach(x => x.classList.remove('active'));
+  const nb = document.getElementById('nav-' + p);
+  if (nb) nb.classList.add('active');
+  if (p === 'appointments') { loadAppts(); }
+  if (p === 'home') { loadStats(); renderHomeRecent(); }
+  if (p === 'profile') { loadProfForm(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════════════════════════
+async function loadStats() {
+  try {
+    const { data } = await api('GET', `/stats?email=${encodeURIComponent(userEmail)}`);
+    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    set('h-total', data.total); set('h-conf', data.confirmed);
+    set('sc-up', data.upcoming); set('sc-co', data.confirmed);
+    set('sc-pb', data.prebooked); set('sc-ca', data.cancelled);
+    const badge = document.getElementById('nav-count');
+    const active = data.total - data.cancelled;
+    badge.textContent = active;
+    badge.style.display = active > 0 ? 'inline' : 'none';
+  } catch(e) { console.warn('Stats error:', e.message); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DOCTORS
+// ═══════════════════════════════════════════════════════════════
+async function loadDoctors(filter) {
+  const grid = document.getElementById('doc-grid');
+  if (!grid) return;
+  const sp = filter !== undefined ? filter : (document.getElementById('b-sp')?.value || '');
+  grid.innerHTML = '<div class="skeleton"></div>'.repeat(3);
+  try {
+    const { data } = await api('GET', `/doctors${sp ? '?specialty=' + encodeURIComponent(sp) : ''}`);
+    if (!data.length) { grid.innerHTML = '<div style="color:var(--g400);font-size:13px;grid-column:span 3;padding:16px 0;">No doctors found for this specialty.</div>'; return; }
+    grid.innerHTML = data.map(d => `
+      <div class="doc-card ${selDocId === d.id ? 'sel' : ''}" onclick="pickDoc(${d.id},'${d.name}','${d.specialty}','${d.fee}','${d.emoji}')">
+        <div class="doc-av">${d.emoji}</div>
+        <div class="doc-name">${d.name}</div>
+        <div class="doc-sp">${d.specialty}</div>
+        <div class="doc-fee">${d.fee} · ${d.rating}⭐</div>
+        <div class="doc-ok">● ${d.available_days}</div>
+      </div>`).join('');
+  } catch(e) { grid.innerHTML = '<div style="color:var(--red);font-size:13px;grid-column:span 3;">Failed to load doctors. Is the server running?</div>'; }
+}
+
+function pickDoc(id, name, spec, fee, emoji) {
+  selDocId = id;
+  selDocObj = { id, name, spec, fee, emoji };
+  loadDoctors();
+  document.getElementById('doc-err').style.display = 'none';
+  updateSum();
+  advStep(2);
+  // reload slots if date already set
+  if (document.getElementById('b-dt').value) loadSlots();
+}
+
+function filterDocs() { selDocId = null; selDocObj = null; loadDoctors(); updateSum(); }
+
+// ═══════════════════════════════════════════════════════════════
+//  SLOTS
+// ═══════════════════════════════════════════════════════════════
+async function loadSlots() {
+  const dt  = document.getElementById('b-dt').value;
+  const grid = document.getElementById('slots-grid');
+  if (!dt || !selDocId) {
+    grid.innerHTML = '<div style="grid-column:span 4;color:var(--g400);font-size:13px;padding:18px 0;text-align:center;">Select a doctor and date first</div>';
+    return;
+  }
+  grid.innerHTML = '<div class="skeleton" style="grid-column:span 4;height:60px;"></div>';
+  selSlot = null;
+  try {
+    const { data } = await api('GET', `/slots?doctorId=${selDocId}&date=${dt}`);
+    grid.innerHTML = data.map(s => {
+      const bk = !s.available;
+      return `<div class="slot ${bk ? 'bk' : ''}" ${bk ? '' : `onclick="pickSlot('${s.time}')"`}>${bk ? `<s style="font-size:11px">${s.time}</s>` : s.time}</div>`;
+    }).join('');
+    updateSum();
+    advStep(3);
+  } catch(e) { grid.innerHTML = '<div style="grid-column:span 4;color:var(--red);font-size:13px;padding:16px;text-align:center;">Failed to load slots.</div>'; }
+}
+
+function pickSlot(s) {
+  selSlot = s;
+  document.querySelectorAll('.slot:not(.bk)').forEach(x => x.classList.toggle('sel', x.textContent === s));
+  document.getElementById('slot-err').style.display = 'none';
+  updateSum();
+  advStep(4);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STEPS
+// ═══════════════════════════════════════════════════════════════
+function advStep(n) {
+  for (let i = 1; i <= 4; i++) {
+    const s = document.getElementById('s' + i), c = document.getElementById('sc' + i);
+    if (!s || !c) continue;
+    s.classList.remove('active', 'done');
+    if (i < n) { s.classList.add('done'); c.textContent = '✓'; }
+    else if (i === n) { s.classList.add('active'); c.textContent = i; }
+    else c.textContent = i;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SUMMARY
+// ═══════════════════════════════════════════════════════════════
+function v(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; }
+function updateSum() {
+  const fn = v('b-fn'), ln = v('b-ln'), dt = v('b-dt'), vt = v('b-vt');
+  const el = document.getElementById('book-sum'); if (!el) return;
+  if (!fn && !selDocObj && !dt && !selSlot) {
+    el.innerHTML = '<div style="text-align:center;padding:18px 0;color:var(--g400);font-size:13px;"><div style="font-size:24px;margin-bottom:5px;">📝</div>Fill the form to preview</div>';
+    return;
+  }
+  el.innerHTML = `<div class="sum-box">
+    <div class="sum-row"><span>Patient</span><span>${fn || ln ? fn + ' ' + ln : '—'}</span></div>
+    <div class="sum-row"><span>Doctor</span><span>${selDocObj ? selDocObj.name : '—'}</span></div>
+    <div class="sum-row"><span>Specialty</span><span>${selDocObj ? selDocObj.spec : '—'}</span></div>
+    <div class="sum-row"><span>Date</span><span>${dt ? fd(dt) : '—'}</span></div>
+    <div class="sum-row"><span>Time Slot</span><span>${selSlot || '—'}</span></div>
+    <div class="sum-row"><span>Visit Type</span><span>${vt || '—'}</span></div>
+    <div class="sum-row total"><span>Fee</span><span>${selDocObj ? selDocObj.fee : '—'}</span></div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  BOOK
+// ═══════════════════════════════════════════════════════════════
+async function submitBooking() {
+  let ok = true;
+  ['b-fn','b-ln','b-em','b-ph','b-rs'].forEach(id => {
+    const e = document.getElementById(id);
+    if (!e.value.trim()) { e.classList.add('err'); ok = false; } else e.classList.remove('err');
+  });
+  if (!selDocId) { document.getElementById('doc-err').style.display = 'block'; ok = false; }
+  if (!v('b-dt')) { document.getElementById('b-dt').classList.add('err'); ok = false; }
+  if (!selSlot) { document.getElementById('slot-err').style.display = 'block'; ok = false; }
+  if (!ok) { toast('⚠️ Please fill in all required fields.', 'error'); return; }
+
+  const btn = document.getElementById('btn-confirm-book');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"></span> Saving & Sending Email...';
+
+  try {
+    const result = await api('POST', '/appointments', {
+      firstName: v('b-fn'), lastName: v('b-ln'), email: v('b-em'), phone: v('b-ph'),
+      dob: v('b-dob'), gender: v('b-gn'), blood: v('b-bl'), insurance: v('b-ins'),
+      doctorId: selDocId, date: v('b-dt'), slot: selSlot,
+      visitType: v('b-vt'), reason: v('b-rs'), status: 'confirmed'
+    });
+
+    lastBookedTicket = result.ticketId;
+    lastBookedEmail  = v('b-em');
+    document.getElementById('m-tid').textContent = result.ticketId;
+    document.getElementById('m-email-sent').textContent = v('b-em');
+    document.getElementById('m-detail').innerHTML = `
+      <div class="cgi"><label>Patient</label><span>${v('b-fn')} ${v('b-ln')}</span></div>
+      <div class="cgi"><label>Doctor</label><span>${selDocObj.name}</span></div>
+      <div class="cgi"><label>Specialty</label><span>${selDocObj.spec}</span></div>
+      <div class="cgi"><label>Date</label><span>${fd(v('b-dt'))}</span></div>
+      <div class="cgi"><label>Time</label><span>${selSlot}</span></div>
+      <div class="cgi"><label>Visit Type</label><span>${v('b-vt')}</span></div>
+      <div class="cgi"><label>Fee</label><span style="color:var(--teal)">${selDocObj.fee}</span></div>
+      <div class="cgi"><label>Status</label><span style="color:var(--green);font-weight:700;">✅ Confirmed</span></div>`;
+    openModal('m-confirm');
+    resetBook();
+    loadStats();
+  } catch(e) {
+    toast('❌ ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔒 Confirm & Book Appointment';
+  }
+}
+
+function resetBook() {
+  ['b-fn','b-ln','b-em','b-ph','b-dob','b-rs','b-ins'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+  ['b-gn','b-bl','b-sp'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+  document.getElementById('b-dt').value = '';
+  document.getElementById('b-vt').value = 'In-Person Visit';
+  selDocId = null; selDocObj = null; selSlot = null;
+  document.getElementById('slots-grid').innerHTML = '<div style="grid-column:span 4;color:var(--g400);font-size:13px;padding:18px;text-align:center;">Select a doctor and date first</div>';
+  loadDoctors('');
+  updateSum();
+  advStep(1);
+  prefillBookingEmail();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PRE-BOOK
+// ═══════════════════════════════════════════════════════════════
+async function populatePreBookDoctors() {
+  try {
+    const { data } = await api('GET', '/doctors');
+    const sel = document.getElementById('p-dr');
+    if (sel) sel.innerHTML = data.map(d => `<option value="${d.id}">${d.name} — ${d.specialty}</option>`).join('');
+  } catch(e) {}
+}
+
+async function submitPreBook() {
+  let ok = true;
+  ['p-fn','p-ln','p-em','p-ph'].forEach(id => {
+    const e = document.getElementById(id);
+    if (!e.value.trim()) { e.classList.add('err'); ok = false; } else e.classList.remove('err');
+  });
+  if (!v('p-sp')) { document.getElementById('p-sp').classList.add('err'); ok = false; }
+  if (!v('p-dt')) { document.getElementById('p-dt').classList.add('err'); ok = false; }
+  if (!ok) { toast('⚠️ Please fill in all required fields.', 'error'); return; }
+
+  const btn = document.getElementById('btn-prebook');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"></span> Saving...';
+
+  try {
+    // Find doctor id from dropdown
+    const drSel = document.getElementById('p-dr');
+    const drId  = parseInt(drSel.value) || 1;
+    const result = await api('POST', '/appointments', {
+      firstName: v('p-fn'), lastName: v('p-ln'), email: v('p-em'), phone: v('p-ph'),
+      doctorId: drId, date: v('p-dt'), slot: v('p-tm'),
+      visitType: v('p-vt'), reason: v('p-nt'), priority: v('p-pr'),
+      status: 'prebooked'
+    });
+
+    lastBookedTicket = result.ticketId;
+    lastBookedEmail  = v('p-em');
+    document.getElementById('m-tid').textContent = result.ticketId;
+    document.getElementById('m-email-sent').textContent = v('p-em');
+    document.getElementById('m-detail').innerHTML = `
+      <div class="cgi"><label>Patient</label><span>${v('p-fn')} ${v('p-ln')}</span></div>
+      <div class="cgi"><label>Specialty</label><span>${v('p-sp')}</span></div>
+      <div class="cgi"><label>Date</label><span>${fd(v('p-dt'))}</span></div>
+      <div class="cgi"><label>Time</label><span>${v('p-tm')}</span></div>
+      <div class="cgi"><label>Priority</label><span>${v('p-pr')}</span></div>
+      <div class="cgi"><label>Status</label><span style="color:var(--purple);font-weight:700;">⏰ Pre-Booked</span></div>`;
+    openModal('m-confirm');
+    ['p-fn','p-ln','p-em','p-ph','p-nt'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+    document.getElementById('p-sp').value = '';
+    document.getElementById('p-dt').value = '';
+    loadStats();
+    prefillBookingEmail();
+  } catch(e) { toast('❌ ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '📌 Submit Pre-Booking Request'; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  APPOINTMENTS
+// ═══════════════════════════════════════════════════════════════
+async function loadAppts() {
+  const c = document.getElementById('appt-list'); if (!c) return;
+  c.innerHTML = '<div class="skeleton" style="margin-bottom:8px;"></div>'.repeat(3);
+  try {
+    const { data } = await api('GET', `/appointments?email=${encodeURIComponent(userEmail)}`);
+    allAppts = data;
+    renderAppts();
+  } catch(e) { c.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><h4>Failed to load</h4><p>Is the server running?</p></div>'; }
+}
+
+function renderAppts() {
+  const c = document.getElementById('appt-list'); if (!c) return;
+  const srch = (document.getElementById('s-appt')?.value || '').toLowerCase();
+  const sf   = document.getElementById('f-status')?.value || '';
+  const today = new Date().toISOString().split('T')[0];
+
+  let list = allAppts.filter(a => {
+    const ms = ((a.doctor_name||'') + (a.specialty||'') + (a.first_name||'') + (a.last_name||'') + (a.ticket_id||'')).toLowerCase();
+    const mS = ms.includes(srch);
+    const mSt = sf ? a.status === sf : true;
+    const mT = activeTab === 'all' ? true
+      : activeTab === 'upcoming' ? (a.appt_date >= today && a.status !== 'cancelled')
+      : activeTab === 'past'     ? a.appt_date < today
+      : a.status === 'prebooked';
+    return mS && mSt && mT;
+  });
+
+  if (!list.length) { c.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><h4>No appointments found</h4><p>Try adjusting filters or book a new appointment.</p></div>'; return; }
+  c.innerHTML = '<div class="appt-list">' + list.map(a => `
+    <div class="appt-item">
+      <div class="appt-av">${a.emoji || '👨‍⚕️'}</div>
+      <div class="appt-info">
+        <h4>${a.doctor_name}</h4>
+        <p>${a.specialty} · ${a.visit_type} · <span style="font-family:monospace">${a.ticket_id}</span></p>
+        <div style="margin-top:3px;"><span class="badge ${bc(a.status)}">${bl(a.status)}</span></div>
+      </div>
+      <div class="appt-time"><div class="t">${a.appt_slot}</div><div class="d">${fd(a.appt_date)}</div></div>
+      <div class="appt-actions">
+        <button class="bsm bv" onclick="viewAppt('${a.ticket_id}')">🔍</button>
+        ${a.status !== 'cancelled' ? `<button class="bsm be" onclick="editAppt('${a.ticket_id}','${a.appt_date}','${a.appt_slot}','${a.visit_type || ''}','${(a.reason||'').replace(/'/g,"\\'")}')">✏️</button>` : ''}
+        ${a.status !== 'cancelled' ? `<button class="bsm bc" onclick="promptCancel('${a.ticket_id}','${a.doctor_name}',\`${fd(a.appt_date)}\`,'${a.appt_slot}')">✕</button>` : ''}
+      </div>
+    </div>`).join('') + '</div>';
+}
+
+function setTab(t, el) {
+  activeTab = t;
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  renderAppts();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  VIEW APPOINTMENT
+// ═══════════════════════════════════════════════════════════════
+async function viewAppt(ticketId) {
+  document.getElementById('m-view-body').innerHTML = '<div class="skeleton" style="height:200px;"></div>';
+  openModal('m-view');
+  try {
+    const { data: a } = await api('GET', `/appointments/${ticketId}`);
+    document.getElementById('m-view-body').innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--g50);border-radius:10px;border:1px solid var(--g200);margin-bottom:18px;">
+        <div style="font-size:40px;">${a.emoji || '👨‍⚕️'}</div>
+        <div><div style="font-size:16px;font-weight:700;">${a.doctor_name}</div><div style="color:var(--teal);font-size:12px;font-weight:600;">${a.specialty}</div><div style="margin-top:4px;"><span class="badge ${bc(a.status)}">${bl(a.status)}</span></div></div>
+        <div style="margin-left:auto;text-align:right;"><div style="font-family:monospace;font-size:13px;font-weight:700;color:var(--teal);">${a.ticket_id}</div></div>
+      </div>
+      <div class="tp">
+        <div class="tp-h"><div><strong>MediBook</strong><div style="font-size:11px;color:var(--g400);">Appointment Ticket</div></div><div style="font-size:28px;">🏥</div></div>
+        <div class="tp-g">
+          <div class="tp-i"><label>Patient</label><span>${a.first_name} ${a.last_name}</span></div>
+          <div class="tp-i"><label>Contact</label><span>${a.phone}</span></div>
+          <div class="tp-i"><label>Doctor</label><span>${a.doctor_name}</span></div>
+          <div class="tp-i"><label>Specialty</label><span>${a.specialty}</span></div>
+          <div class="tp-i"><label>Date</label><span>${fd(a.appt_date)}</span></div>
+          <div class="tp-i"><label>Time</label><span>${a.appt_slot}</span></div>
+          <div class="tp-i"><label>Visit Type</label><span>${a.visit_type}</span></div>
+          <div class="tp-i"><label>Fee</label><span>${a.doctor_fee || 'TBD'}</span></div>
+          ${a.reason ? `<div class="tp-i" style="grid-column:span 2"><label>Reason</label><span style="font-weight:400;color:var(--g600);">${a.reason}</span></div>` : ''}
+        </div>
+      </div>
+      <div class="mbts" style="margin-top:16px;">
+        <button class="btn-s" onclick="closeModal('m-view')">Close</button>
+        ${a.status !== 'cancelled' ? `<button class="btn-p" style="background:var(--purple);" onclick="closeModal('m-view');editAppt('${a.ticket_id}','${a.appt_date}','${a.appt_slot}','${a.visit_type}','')">✏️ Edit</button>` : ''}
+        <button class="btn-p" onclick="printAppt('${a.ticket_id}')">🖨️ Print</button>
+        ${a.status !== 'cancelled' ? `<button class="btn-d" onclick="closeModal('m-view');promptCancel('${a.ticket_id}','${a.doctor_name}','${fd(a.appt_date)}','${a.appt_slot}')">✕ Cancel</button>` : ''}
+      </div>`;
+  } catch(e) { document.getElementById('m-view-body').innerHTML = '<p style="color:var(--red);">Failed to load details.</p>'; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EDIT
+// ═══════════════════════════════════════════════════════════════
+function editAppt(id, date, slot, type, reason) {
+  document.getElementById('ed-id').value  = id;
+  document.getElementById('ed-dt').value  = date;
+  document.getElementById('ed-sl').value  = slot;
+  document.getElementById('ed-vt').value  = type;
+  document.getElementById('ed-rs').value  = reason;
+  openModal('m-edit');
+}
+
+async function saveEdit() {
+  const id = document.getElementById('ed-id').value;
+  const nd = document.getElementById('ed-dt').value;
+  if (!nd) { toast('⚠️ Select a date.', 'error'); return; }
+  const btn = document.querySelector('#m-edit .btn-p');
+  btn.disabled = true; btn.innerHTML = '<span class="loading"></span> Saving...';
+  try {
+    await api('PATCH', `/appointments/${id}`, {
+      date: nd, slot: document.getElementById('ed-sl').value,
+      visitType: document.getElementById('ed-vt').value,
+      reason: document.getElementById('ed-rs').value
+    });
+    closeModal('m-edit');
+    loadAppts();
+    loadStats();
+    toast('✅ Appointment updated! Reschedule email sent.', 'success');
+  } catch(e) { toast('❌ ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '💾 Save Changes'; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CANCEL
+// ═══════════════════════════════════════════════════════════════
+function promptCancel(id, docName, date, slot) {
+  cancelTicket = id;
+  document.getElementById('m-cancel-info').innerHTML = `<strong>${docName}</strong><br>📅 ${date} at ${slot}<br>🎫 ${id}`;
+  openModal('m-cancel');
+}
+
+async function doCancel() {
+  const btn = document.querySelector('#m-cancel .btn-d');
+  btn.disabled = true; btn.textContent = 'Cancelling...';
+  try {
+    await api('DELETE', `/appointments/${cancelTicket}`);
+    closeModal('m-cancel');
+    loadAppts(); loadStats();
+    toast('🚫 Appointment cancelled. Cancellation email sent.', 'info');
+  } catch(e) { toast('❌ ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Yes, Cancel'; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HOME RECENT
+// ═══════════════════════════════════════════════════════════════
+function renderHomeRecent() {
+  const el = document.getElementById('home-recent'); if (!el) return;
+  const list = allAppts.slice(0, 4);
+  if (!list.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🏥</div><h4>No appointments yet</h4><p>Book your first appointment!</p></div>'; return; }
+  el.innerHTML = '<div class="appt-list">' + list.map(a => `
+    <div class="appt-item">
+      <div class="appt-av">${a.emoji || '👨‍⚕️'}</div>
+      <div class="appt-info"><h4>${a.doctor_name}</h4><p>${a.specialty} · <span style="font-family:monospace">${a.ticket_id}</span></p><div style="margin-top:3px;"><span class="badge ${bc(a.status)}">${bl(a.status)}</span></div></div>
+      <div class="appt-time"><div class="t">${a.appt_slot}</div><div class="d">${fd(a.appt_date)}</div></div>
+      <div class="appt-actions"><button class="bsm bv" onclick="viewAppt('${a.ticket_id}')">🔍</button></div>
+    </div>`).join('') + '</div>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PROFILE
+// ═══════════════════════════════════════════════════════════════
+async function loadProfForm() {
+  document.getElementById('pf-em').value = userEmail;
+  try {
+    const { data } = await api('GET', `/patients/profile?email=${encodeURIComponent(userEmail)}`);
+    if (data) {
+      const map = { fn:'first_name',ln:'last_name',ph:'phone',db:'dob',gn:'gender',bl:'blood_group',ins:'insurance',addr:'address',ec:'emergency_contact',al:'allergies' };
+      Object.entries(map).forEach(([k,v]) => { const e = document.getElementById('pf-'+k); if (e && data[v]) e.value = data[v]; });
+    }
+    renderProfSum();
+  } catch(e) {}
+}
+
+async function saveProfile() {
+  const btn = document.querySelector('#page-profile .btn-main');
+  btn.disabled = true; btn.innerHTML = '<span class="loading"></span> Saving...';
+  try {
+    await api('PUT', '/patients/profile', {
+      firstName: v('pf-fn'), lastName: v('pf-ln'), email: userEmail,
+      phone: v('pf-ph'), dob: v('pf-db'), gender: v('pf-gn'), blood: v('pf-bl'),
+      insurance: v('pf-ins'), address: v('pf-addr'), emergencyContact: v('pf-ec'), allergies: v('pf-al')
+    });
+    renderProfSum();
+    toast('✅ Profile saved to database!', 'success');
+  } catch(e) { toast('❌ ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '💾 Save Profile to Database'; }
+}
+
+async function renderProfSum() {
+  const el = document.getElementById('prof-sum'); if (!el) return;
+  const total = allAppts.length;
+  const co  = allAppts.filter(a => a.status === 'confirmed').length;
+  const pb  = allAppts.filter(a => a.status === 'prebooked').length;
+  const ca  = allAppts.filter(a => a.status === 'cancelled').length;
+  el.innerHTML = `<div>📧 <strong>${userEmail}</strong></div>
+    <hr style="border:none;border-top:1px solid var(--g200);margin:7px 0;">
+    <div>📅 Total bookings: <strong>${total}</strong></div>
+    <div>✅ Confirmed: <strong>${co}</strong></div>
+    <div>⏰ Pre-booked: <strong>${pb}</strong></div>
+    <div>❌ Cancelled: <strong>${ca}</strong></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════════════════
+function exportCSV() {
+  if (!allAppts.length) { toast('⚠️ No appointments to export.', 'error'); return; }
+  const hdr = ['Ticket ID','Status','Doctor','Specialty','Date','Time','Visit Type','Patient','Email','Phone','Reason','Fee'];
+  const rows = allAppts.map(a => [a.ticket_id,a.status,a.doctor_name,a.specialty,a.appt_date,a.appt_slot,a.visit_type,(a.first_name+' '+a.last_name),a.email,a.phone,(a.reason||'').replace(/,/g,';'),a.doctor_fee||'']);
+  const csv = hdr.join(',') + '\n' + rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const b = new Blob([csv], { type: 'text/csv' });
+  const u = URL.createObjectURL(b);
+  const a = document.createElement('a'); a.href = u; a.download = 'medibook_' + Date.now() + '.csv'; a.click();
+  URL.revokeObjectURL(u);
+  toast('⬇️ Exported as CSV!', 'success');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PRINT
+// ═══════════════════════════════════════════════════════════════
+function printTicket() {
+  if (!lastBookedTicket) return;
+  printAppt(lastBookedTicket);
+}
+async function printAppt(ticketId) {
+  try {
+    const { data: a } = await api('GET', `/appointments/${ticketId}`);
+    const w = window.open('', '_blank', 'width=560,height=680');
+    w.document.write(`<!DOCTYPE html><html><head><title>MediBook Ticket</title>
+      <style>body{font-family:sans-serif;padding:36px;max-width:480px;margin:0 auto;} table{width:100%;border-collapse:collapse;} td{padding:7px 0;font-size:14px;}</style>
+      </head><body>
+      <h2 style="color:#0d9488;margin:0 0 4px">MediBook</h2>
+      <h3 style="margin:0 0 20px;color:#0a1628;">Appointment Ticket</h3>
+      <div style="background:#f0fdfa;border:2px dashed #0d9488;padding:14px;border-radius:10px;text-align:center;margin-bottom:22px;">
+        <p style="font-size:10px;color:#9ca3af;margin:0 0 4px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Ticket ID</p>
+        <p style="font-family:monospace;font-size:22px;font-weight:700;color:#0d9488;margin:0;letter-spacing:3px;">${a.ticket_id}</p>
+      </div>
+      <table><tr><td style="color:#6b7280;width:40%">Patient</td><td style="font-weight:600">${a.first_name} ${a.last_name}</td></tr>
+      <tr><td style="color:#6b7280">Doctor</td><td style="font-weight:600">${a.doctor_name}</td></tr>
+      <tr><td style="color:#6b7280">Specialty</td><td style="font-weight:600">${a.specialty}</td></tr>
+      <tr><td style="color:#6b7280">Date</td><td style="font-weight:600">${fd(a.appt_date)}</td></tr>
+      <tr><td style="color:#6b7280">Time</td><td style="font-weight:600">${a.appt_slot}</td></tr>
+      <tr><td style="color:#6b7280">Visit Type</td><td style="font-weight:600">${a.visit_type}</td></tr>
+      <tr><td style="color:#6b7280">Fee</td><td style="font-weight:600;color:#0d9488">${a.doctor_fee || 'TBD'}</td></tr>
+      </table>
+      <p style="margin-top:22px;font-size:12px;color:#9ca3af;line-height:1.7;">Present this ticket at reception.<br>Helpline: 1-800-MEDIBOOK &nbsp;|&nbsp; Emergency: 911</p>
+      <script>window.onload=()=>{window.print();window.close();}<\/script></body></html>`);
+    w.document.close();
+  } catch(e) { toast('Failed to load ticket.', 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); }));
+
+// ═══════════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════════
+let tt = null;
+function toast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3800);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════════
+function fd(d) { if (!d) return '—'; return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }); }
+function bc(s) { return { confirmed: 'b-c', prebooked: 'b-pb', cancelled: 'b-x', pending: 'b-p' }[s] || 'b-p'; }
+function bl(s) { return { confirmed: '✅ Confirmed', prebooked: '⏰ Pre-booked', cancelled: '❌ Cancelled', pending: '⏳ Pending' }[s] || s; }
+function quickBook(sp) { showPage('book'); setTimeout(() => { document.getElementById('b-sp').value = sp; loadDoctors(sp); }, 80); }
+
+// ── Date limits ──
+const tStr = new Date().toISOString().split('T')[0];
+const mxD  = new Date(); mxD.setDate(mxD.getDate() + 90);
+const mxStr = mxD.toISOString().split('T')[0];
+document.querySelectorAll('input[type=date]').forEach(inp => { inp.min = tStr; inp.max = mxStr; });
+document.querySelectorAll('input,select,textarea').forEach(el => {
+  el.addEventListener('input',  () => el.classList.remove('err'));
+  el.addEventListener('change', () => el.classList.remove('err'));
+});
+
+// ── Boot ─────────────────────────────────────────────────────
+initApp();
+</script>
+</body>
+</html>
